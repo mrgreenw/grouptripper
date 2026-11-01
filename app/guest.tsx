@@ -5,7 +5,7 @@ import {expenseShares,money} from './lib/expenses';
 import {labels} from './intake';
 export default function GuestPlanner({board,me,organizer,busy,onSave,canNavigate}:{board:Board;me:string|null;organizer:boolean;busy:boolean;onSave:(a:Action)=>Promise<boolean>;canNavigate:()=>boolean}){
  const [tab,rawSetTab]=useState('overview'),[draft,setDraft]=useState<Guest|null>(null),[settle,setSettle]=useState(false),[showRemoved,setShowRemoved]=useState(false),[edit,setEdit]=useState<Cost|null>(null),[split,setSplit]=useState('all'),[selected,setSelected]=useState<string[]>([]);
- const expenseId=useRef<string>('');if(!expenseId.current)expenseId.current=crypto.randomUUID();function setTab(next:string){if(canNavigate())rawSetTab(next);}
+ const expenseId=useRef<string>('');if(!expenseId.current)expenseId.current=crypto.randomUUID();function setTab(next:string){if(canNavigate()){setDraft(null);setEdit(null);setSplit('all');setSelected([]);rawSetTab(next);}}
  const c=board.config,g=board.guests.find(g=>g.id===me),p=draft||g,summary=totals(board),r=results(board),name=(id:string)=>board.guests.find(g=>g.id===id)?.name||c.organizer;
  const tabs=[['overview','Overview'],['preferences','My preferences'],['places','Places'],['results','Group results'],...c.modules.map(m=>[m,labels[m]])];const active=tabs.some(([id])=>id===tab)?tab:'overview';
  const patch=(v:Partial<Guest>)=>{if(p)setDraft({...p,...v});};
