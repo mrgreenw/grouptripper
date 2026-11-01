@@ -1,0 +1,66 @@
+{
+  "name": "The Long Weekend",
+  "kind": "Friends getaway",
+  "organizer": "Your organizer",
+  "welcome": "A little adventure. Good food. Your favorite people. Let’s find a place and a weekend that work for everyone.",
+  "dates": [
+    {
+      "id": "2027-06-10",
+      "end": "2027-06-13",
+      "label": "June 10–13"
+    },
+    {
+      "id": "2027-06-17",
+      "end": "2027-06-20",
+      "label": "June 17–20"
+    },
+    {
+      "id": "2027-06-24",
+      "end": "2027-06-27",
+      "label": "June 24–27"
+    }
+  ],
+  "destinations": [
+    {
+      "id": "coast",
+      "name": "Coastal escape",
+      "description": "Beach walks, fresh seafood, and a house with room for everyone."
+    },
+    {
+      "id": "mountains",
+      "name": "Mountain retreat",
+      "description": "Scenic trails, slow mornings, and evenings around the fire."
+    },
+    {
+      "id": "city",
+      "name": "City weekend",
+      "description": "Neighborhood cafés, museums, and a very good dinner reservation."
+    }
+  ],
+  "activities": [
+    "Food & drink",
+    "Outdoors",
+    "Arts & culture",
+    "Relaxation",
+    "Nightlife"
+  ],
+  "budgets": [
+    "Under $500",
+    "$500–$1,000",
+    "$1,000–$1,500",
+    "$1,500+"
+  ],
+  "rooms": [
+    "Shared room",
+    "Private room",
+    "Flexible"
+  ],
+  "modules": [
+    "travel",
+    "meals",
+    "groceries",
+    "agenda",
+    "messages",
+    "expenses"
+  ]
+}
