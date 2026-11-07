@@ -1,5 +1,7 @@
 # Current status — November 7, 2026
 
+- Shirt Studio theme starters: eight reusable SVG sample shirts, two editable prompts per theme, matching default draft, alternate theme selection, blank idea, and protection before replacing edited drafts. Public `/shirt-examples` lets visitors browse/copy ideas without registration or rendering. No API/schema/renderer changes. Verified 25 unit tests, TypeScript, all theme selectors, desktop/mobile previews, and local draft loading without shirt submissions.
+
 - Added direct trip invitations and a separate start-your-own-trip share link. Mobile native share and clipboard fallback, preserved invitations through sign-in, organizer pause/resume/replace controls, and 96-bit codes for new invitations.
 - Added owner-only demo capacity controls: 10 trips/100 accounts per rolling 24 hours; 100 trips/1,000 accounts/500 shirt submissions total, adjustable by the owner. Database triggers enforce caps and atomic registration rollback. Pauses leave existing trips and gallery access available. Migration 0002 appends these controls without changing prior migrations. Gallery polling slows when idle and stops fetching in hidden tabs. Verified 22 unit tests, TypeScript, local API regression and concurrent-cap tests, plus phone-width invite sign-in/join and copy-link controls.
 

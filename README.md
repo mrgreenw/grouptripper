@@ -15,6 +15,8 @@ Open the [demo site](https://grouptripper.mrgreenw.chatgpt.site/), choose a them
 
 Each trip's records and Shirt Studio gallery are restricted to its members. The trip creator is its organizer. Accounts can join up to five trips; each trip supports up to 50 guests. **My trips** switches between groups. This shared demo uses durable hosted storage, so changes follow you across devices.
 
+Browse the [shirt examples](https://grouptripper.mrgreenw.chatgpt.site/shirt-examples) without an account: eight sample shirts and sixteen prompt ideas. Inside your trip, Shirt Studio starts with a matching theme idea; customize it or start blank. Browsing and editing examples uses no design allowance.
+
 **Shirt Studio limits:** two submissions per account across all trips in a rolling 24 hours, ten across the entire demo in a rolling 24 hours, and one queued/rendering design per account. Canceled, hidden and failed designs still count. The interface shows remaining allowances, and atomic server checks prevent simultaneous submissions from exceeding them. Designs wait while the renderer is offline.
 
 The original fictional browser-only tour is still available to self-hosted copies using `GROUPTRIPPER_MODE=demo`; it never creates shared records. `live` remains the legacy single-trip mode. The shared demo uses the new `hosted` mode. See [setup](docs/SETUP.md) and [Shirt Studio](docs/SHIRT_STUDIO.md).
