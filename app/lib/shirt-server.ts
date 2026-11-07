@@ -4,6 +4,7 @@ import {db as tripDatabase,digest as tokenHash,input as validateInput,response,e
 import {tripSession} from './hosted';
 import {fail as failure} from './trip';
 import {shirtInput,validJobId,assetKinds} from './shirts';
+import {requireSiteOwner} from './owner-server';
 type Bindings={BUCKET:R2Bucket;SHIRT_WORKER_TOKEN_SHA256?:string;SHIRT_COORDINATOR_TOKEN_SHA256?:string};
 const config=()=>env as unknown as Bindings;
 const now=()=>Math.floor(Date.now()/1000),token=()=>randomBytes(32).toString('hex');
@@ -43,6 +44,13 @@ export async function assetGET(req:Request,id:string,kind:string){try{
  if(JSON.parse(job.input).nsfw&&new URL(req.url).searchParams.get('adult')!=='1')throw failure('Reveal adult designs first.',403);
  const obj=await config().BUCKET.get(`shirts/${id}/${job.lease}/${kind}.webp`);if(!obj)throw failure('Image not found.',404);
  return new Response(obj.body,{headers:{'Content-Type':'image/webp','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':`inline; filename="trip-shirt-${id}-${kind}.webp"`}});
+ }catch(e){return fail(e);}}
+export async function ownerAssetGET(req:Request,id:string,kind:string){try{
+ const db=await requireSiteOwner();if(!validJobId(id)||!assetKinds.includes(kind as 'shirt'))throw failure('Image not found.',404);
+ const job=await db.prepare("SELECT input,lease FROM shirt_jobs WHERE id=? AND status='completed'").bind(id).first<{input:string;lease:string}>();if(!job)throw failure('Image not found.',404);
+ if(JSON.parse(job.input).nsfw&&new URL(req.url).searchParams.get('adult')!=='1')throw failure('Reveal adult designs first.',403);
+ const obj=await config().BUCKET.get(`shirts/${id}/${job.lease}/${kind}.webp`);if(!obj)throw failure('Image not found.',404);
+ return new Response(obj.body,{headers:{'Content-Type':'image/webp','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
  }catch(e){return fail(e);}}
 export async function workerPOST(req:Request){try{
  const db=await workerAuth(req),input=await body(req),time=now();

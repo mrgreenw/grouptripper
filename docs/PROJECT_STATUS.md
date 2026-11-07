@@ -1,5 +1,8 @@
 # Current status — November 7, 2026
 
+- Owner-only `/admin` reviews demo trips, RSVP/preferences, plans/messages, and per-trip Shirt Studio (including hidden designs). Requires the configured verified ChatGPT identity on every API/image request; trip creators do not receive platform-owner rights. Read-only review does not join or modify a trip. `PRIVATE_TRIP_ADMIN_URL` is an optional owner-only navigation link; no cross-site data access.
+- Data separation: independent Sites, D1, R2, sessions, worker/coordinator credentials and queues. The trusted local Windows GPU/ComfyUI process remains shared compute, so this is data/access isolation, not physical or OS-level isolation.
+
 - Existing public GroupTripper demo upgraded to hosted mode: independent shared trips, account-based trip organizers, invite codes, configurable choices, and switching between up to five trips per account. Maximum 50 guests per trip. No source-trip records or private assets copied.
 - Added private per-trip Shirt Studio galleries, editable prompts and lettering, refresh, adult concealment, cancellation and hiding. Server-enforced caps: 2/account and 10/deployment per rolling 24 hours, 1 pending/account. Canceled/hidden/failed jobs still count. Caps are atomic and apply across trips.
 - Schema migration 0001 adds memberships, trip spaces, session trip selection, shirt jobs/worker heartbeat. Existing migrations are unchanged. R2 BUCKET stores previews. Legacy demo/live modes remain available.

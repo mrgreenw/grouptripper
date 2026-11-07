@@ -1,8 +1,9 @@
 import {env} from 'cloudflare:workers';
 import {createHash,randomBytes,scryptSync,timingSafeEqual} from 'node:crypto';
 import {getChatGPTUser} from '../chatgpt-auth';
+import {isSiteOwner} from './owner-auth';
 import {changeBoard,emptyBoard,emptyGuest,fail,type Board,type Action} from './trip';
-type Settings={DB:D1Database;GROUPTRIPPER_MODE?:string;ORGANIZER_EMAIL?:string;TRIP_CODE_SHA256?:string};
+type Settings={DB:D1Database;GROUPTRIPPER_MODE?:string;ORGANIZER_EMAIL?:string;TRIP_CODE_SHA256?:string;PRIVATE_TRIP_ADMIN_URL?:string};
 export const settings=()=>env as unknown as Settings;
 export const isLive=()=>['live','hosted'].includes(settings().GROUPTRIPPER_MODE||'');
 export const response=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
@@ -12,7 +13,7 @@ export const cookieName=(r:Request)=>new URL(r.url).protocol==='https:'?'__Host-
 export const sessionKey=(r:Request)=>(r.headers.get('Cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName(r)+'='))?.slice(cookieName(r).length+1)||'';
 export function cookie(r:Request,value:string,age=60*60*24*14){return `${cookieName(r)}=${value}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${age}${new URL(r.url).protocol==='https:'?'; Secure':''}`;}
 export function db(){if(!isLive())throw fail('This is a browser-only tour. No shared accounts or records are created.',403);if(!settings().DB)throw fail('Trip storage is not configured.',503);return settings().DB;}
-export async function owner(){const user=await getChatGPTUser(),email=settings().ORGANIZER_EMAIL;return !!user?.userId&&!!email&&user.email.toLowerCase()===email.trim().toLowerCase();}
+export async function owner(){return isSiteOwner(await getChatGPTUser(),settings().ORGANIZER_EMAIL);}
 export async function member(r:Request){const token=sessionKey(r);if(!/^[a-f0-9]{64}$/.test(token))return null;return (await db().prepare('SELECT member FROM grouptripper_sessions WHERE token=? AND expires>?').bind(digest(token),Date.now()).first<{member:string}>())?.member||null;}
 export async function readBoard(){const row=await db().prepare('SELECT data,revision FROM grouptripper_trip WHERE id=?').bind('trip').first<{data:string;revision:number}>();return row?{...JSON.parse(row.data) as Board,revision:row.revision}:emptyBoard();}
 export async function writeBoard(previous:Board,next:Board){
