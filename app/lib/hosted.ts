@@ -1,6 +1,7 @@
 import {randomBytes} from 'node:crypto';
 import {db,digest,sessionKey,cookie,input,response,error,passwordHash,check,throttle} from './backend';
-import {changeBoard,emptyBoard,emptyGuest,defaultConfig,fail,type Board,type Action} from './trip';
+import {changeBoard,emptyBoard,emptyGuest,fail,type Board,type Action} from './trip';
+import {configFromTemplate} from './trip-templates';
 export type TripSession={member:string;trip:string;role:string};
 export async function tripSession(r:Request):Promise<TripSession>{
  const raw=sessionKey(r);if(!/^[a-f0-9]{64}$/.test(raw))throw fail('Sign in to your trip first.',401);
@@ -26,7 +27,8 @@ async function addGroup(r:Request,a:Action,id:string,account?:{username:string;p
  const creating=a.groupAction==='create',name=displayName(a);let trip:string,b:Board,code='';
  if(creating){
   if(typeof a.tripName!=='string'||a.tripName.trim().length<2||a.tripName.trim().length>80)throw fail('Give your trip a name of 2–80 characters.');
-  trip=crypto.randomUUID();code='trip-'+randomBytes(6).toString('hex');b=emptyBoard({...defaultConfig,name:a.tripName.trim(),organizer:name});
+  const config=configFromTemplate(a.templateId,{name:a.tripName.trim(),organizer:name,customKind:a.customKind,startDate:a.startDate,endDate:a.endDate,firstDestination:a.firstDestination});
+  trip=crypto.randomUUID();code='trip-'+randomBytes(6).toString('hex');b=emptyBoard(config);
  }else{
   const raw=typeof a.code==='string'?a.code.trim().toLowerCase():'';
   const space=await db().prepare('SELECT id FROM grouptripper_spaces WHERE code=?').bind(raw).first<{id:string}>();if(!space)throw fail('That trip code did not match. Check with your organizer.',401);trip=space.id;b=await scopedBoard(trip);

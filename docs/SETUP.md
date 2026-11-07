@@ -2,7 +2,7 @@
 
 ## Use the shared demo — no deployment needed
 
-Visit https://grouptripper.mrgreenw.chatgpt.site/ and choose Create your trip. Enter your trip name, display name, username and an 8-character-or-longer password. No special characters or ChatGPT account required. Configure the date and destination choices, then Copy invite. Friends choose Join a trip and enter that code. My trips lets an existing account create or join another group. Trip settings are editable only by that trip's creator.
+Visit https://grouptripper.mrgreenw.chatgpt.site/ and choose a trip theme or Build a custom trip. Themed starters include editable example weekends and destination ideas; custom trips ask for your own first date range and destination. Enter your trip name, display name, username and an 8-character-or-longer password. No special characters or ChatGPT account required. Configure the date and destination choices, then Copy invite. Friends choose Join a trip and enter that code. My trips lets an existing account create or join another group. Trip settings are editable only by that trip's creator.
 
 The shared demo includes Shirt Studio with 2/account/day, 10/deployment/day, and 1 pending/account. Daily means a rolling 24 hours. Rendering is provided by the demo owner's separately paired worker. There is no password recovery flow; keep your sign-in details.
 

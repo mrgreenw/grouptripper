@@ -4,6 +4,8 @@ GroupTripper generalizes the planning flow of a private group trip without distr
 
 ## Included
 
+- Hosted new-trip starters for family reunions, golf, girls’/boys’ weekends, bachelor/bachelorette parties, birthdays, and a custom trip. Theme options prefill editable settings only. Dates and destination categories are examples to review, not bookings or researched recommendations. Custom trips use the organizer’s dates and first place.
+
 - Browser-isolated fictional example with six sample guests, sample choices, plans, a message and a shared house-deposit expense. Visitors add a fictional nickname; no account or personal contact information is required for the tour.
 - Organizer intake, JSON import/export, configurable trip types, date ranges, destinations, activities, budget choices, room preferences and enabled tools.
 - Guest RSVP, availability for each date option, ordered destination ranking, budget, room and activity preferences.

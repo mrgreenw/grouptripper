@@ -1,5 +1,7 @@
 # Current status — November 7, 2026
 
+- New-trip template chooser: Family reunion, Golf trip, Girls’ weekend, Boys’ weekend, Bachelor party, Bachelorette party, Birthday weekend, and Custom. Hosted creation uses server-validated template configs, tailored activities/lodging/budget/destination ideas and three future example weekends. Custom requires the organizer’s first dates and destination. Settings remain editable; choosing a template never copies participants, plans, messages, or shirt jobs. Existing groups and the separate golf Site are unchanged. Verified 19 unit tests, TypeScript, disposable API creation/join/reload checks, and desktop/mobile template and custom-form behavior.
+
 - Owner-only `/admin` reviews demo trips, RSVP/preferences, plans/messages, and per-trip Shirt Studio (including hidden designs). Requires the configured verified ChatGPT identity on every API/image request; trip creators do not receive platform-owner rights. Read-only review does not join or modify a trip. `PRIVATE_TRIP_ADMIN_URL` is an optional owner-only navigation link; no cross-site data access.
 - Data separation: independent Sites, D1, R2, sessions, worker/coordinator credentials and queues. The trusted local Windows GPU/ComfyUI process remains shared compute, so this is data/access isolation, not physical or OS-level isolation.
 

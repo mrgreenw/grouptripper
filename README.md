@@ -11,7 +11,7 @@ Plan a family reunion, friends getaway, outdoor adventure, retreat, city break o
 
 ## Try the shared demo
 
-Open the [demo site](https://grouptripper.mrgreenw.chatgpt.site/), choose **Create your trip**, and make an account. Customize your dates, places, and planning tools, then use **Copy invite** to send friends the site and your trip code. They choose **Join a trip** and create their own accounts. No ChatGPT account or separate hosting setup is needed.
+Open the [demo site](https://grouptripper.mrgreenw.chatgpt.site/), choose a themed starter or **Build a custom trip**, and make an account. Family reunion, Golf trip, Girls’ weekend, Boys’ weekend, Bachelor party, Bachelorette party, and Birthday weekend starters prefill editable activities, budget/room choices, destination ideas, and example weekends. Custom trips start with your own occasion, dates, and first destination. Customize your dates, places, and planning tools, then use **Copy invite** to send friends the site and your trip code. They choose **Join a trip** and create their own accounts. No ChatGPT account or separate hosting setup is needed.
 
 Each trip's records and Shirt Studio gallery are restricted to its members. The trip creator is its organizer. Accounts can join up to five trips; each trip supports up to 50 guests. **My trips** switches between groups. This shared demo uses durable hosted storage, so changes follow you across devices.
 
