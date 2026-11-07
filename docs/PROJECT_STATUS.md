@@ -4,7 +4,7 @@
 - Added private per-trip Shirt Studio galleries, editable prompts and lettering, refresh, adult concealment, cancellation and hiding. Server-enforced caps: 2/account and 10/deployment per rolling 24 hours, 1 pending/account. Canceled/hidden/failed jobs still count. Caps are atomic and apply across trips.
 - Schema migration 0001 adds memberships, trip spaces, session trip selection, shirt jobs/worker heartbeat. Existing migrations are unchanged. R2 BUCKET stores previews. Legacy demo/live modes remain available.
 - The owner explicitly approved a separate Windows on-demand task, Mac coordinator and fresh queue-only credentials for the demo. Private installation/configuration stays outside Git. The existing golf-trip Site/database/configuration remains separate.
-- Verified 14 existing unit/distribution tests, TypeScript, production build, disposable loopback API checks for tenant isolation and concurrent quotas, and desktop/mobile browser behavior. Runtime generation verification is recorded in the release follow-up below.
+- Verified 14 existing unit/distribution tests, TypeScript, production build, disposable loopback API checks for tenant isolation and concurrent quotas, and desktop/mobile browser behavior. Published shared-mode entry and the separately paired renderer health endpoint both returned 200; the renderer reported ready/online. No test guests or designs were created in production.
 
 ## First release (historical)
 
