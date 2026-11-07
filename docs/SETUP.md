@@ -1,6 +1,16 @@
 # Run your own GroupTripper
 
-Each trip gets its own project, Site, database and secrets. The public example is a browser-only fictional tour, not a service that hosts visitors' real trips. You do not need a donation to use the template.
+## Use the shared demo — no deployment needed
+
+Visit https://grouptripper.mrgreenw.chatgpt.site/ and choose Create your trip. Enter your trip name, display name, username and an 8-character-or-longer password. No special characters or ChatGPT account required. Configure the date and destination choices, then Copy invite. Friends choose Join a trip and enter that code. My trips lets an existing account create or join another group. Trip settings are editable only by that trip's creator.
+
+The shared demo includes Shirt Studio with 2/account/day, 10/deployment/day, and 1 pending/account. Daily means a rolling 24 hours. Rendering is provided by the demo owner's separately paired worker. There is no password recovery flow; keep your sign-in details.
+
+## Host your own copy (optional)
+
+The following instructions describe an independent deployment. Use `GROUPTRIPPER_MODE=demo` for a fictional browser-only tour, `live` for the legacy single-trip setup below, or `hosted` for multiple independent groups. Hosted mode uses account-based organizers and generated trip codes; it does not require ORGANIZER_EMAIL or TRIP_CODE_SHA256. Set the Site audience deliberately so invited guests can reach it. Copies never inherit the author's renderer credentials.
+
+Each independent deployment gets its own project, Site, database and secrets. You do not need a donation to use the template.
 
 ## 1. Copy the source
 
@@ -33,9 +43,9 @@ Ask Codex, with the Sites plugin enabled:
 
 > Publish my new GroupTripper copy from this repository as a NEW Site. Read AGENTS.md and docs/SETUP.md first. Confirm the template Site ID was cleared. Create a new Site and fresh D1 DB binding, keep the existing schema migrations, use the installed Sites build/source helpers, and never access or modify the original example Site. Initially publish in demo mode. Give me the new Site URL and its settings location.
 
-The Sites helper creates the new identity and stores it in `.openai/hosting.json`, builds the Worker, and applies schema-only migrations. The only required storage binding is D1 `DB`; R2 is not used. Do not manually create tables from request handlers. The author does not receive access to your database. Hosting access, service limits and any fees are controlled by your hosting account.
+The Sites helper creates the new identity and stores it in `.openai/hosting.json`, builds the Worker, and applies schema-only migrations. D1 `DB` stores trips, accounts and the shirt queue; R2 `BUCKET` stores generated previews. Do not manually create tables from request handlers. The author does not receive access to your database. Hosting access, service limits and any fees are controlled by your hosting account.
 
-The supported authentication integration is Sites' ChatGPT organizer identity. Bare static hosting will only serve assets, not a working shared trip. A direct Cloudflare deployment needs an equivalent trusted identity integration; do not trust client-supplied identity headers on an unprotected Worker.
+Legacy live mode uses Sites' ChatGPT organizer identity. Hosted mode uses account-based trip organizer memberships. Bare static hosting will only serve assets, not a working shared trip. A direct Cloudflare deployment needs an equivalent trusted identity integration; do not trust client-supplied identity headers on an unprotected Worker.
 
 ## 4. Enable your private shared trip
 
@@ -89,3 +99,9 @@ npm run build
 ## Move between Windows and Mac
 
 Commit and push your own repository after changes. On the other computer, inspect the working tree and pull without discarding unfinished work. Install dependencies locally. Keep the SAME Site ID for that established trip, but never copy runtime secrets or local database state through Git. GitHub pushes alone do not deploy Sites; use the Sites source/build/publication workflow, then push any publication commits to GitHub too.
+
+## Shared-demo development and renderer pairing
+
+For hosted-mode local checks, use ignored `.dev.vars` with `GROUPTRIPPER_MODE=hosted`. Apply all schema migrations in order, including `0001_glamorous_proudstar.sql`. Run `node tests/hosted-api-smoke.mjs` against disposable loopback storage with a worker hash for the test-only token specified in that script. It verifies group isolation, organizer boundaries, worker leases and concurrent quotas, and removes the records it creates. Never use its test token in production.
+
+See [SHIRT_STUDIO.md](SHIRT_STUDIO.md) for the optional worker protocol and runtime secrets. Do not copy an existing worker's secrets or source-trip data into a public template.

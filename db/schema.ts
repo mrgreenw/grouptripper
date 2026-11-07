@@ -1,8 +1,12 @@
 // Intentionally empty by default.
 // Add Drizzle tables here when the site actually needs a database.
 // See examples/d1/db/schema.ts for an opt-in example.
-import {sqliteTable,text,integer} from 'drizzle-orm/sqlite-core';
+import {sqliteTable,text,integer,primaryKey,index} from 'drizzle-orm/sqlite-core';
 export const trips=sqliteTable('grouptripper_trip',{id:text('id').primaryKey(),data:text('data').notNull(),revision:integer('revision').notNull()});
 export const accounts=sqliteTable('grouptripper_accounts',{id:text('id').primaryKey(),username:text('username').notNull().unique(),password:text('password').notNull()});
-export const sessions=sqliteTable('grouptripper_sessions',{token:text('token').primaryKey(),member:text('member').notNull(),expires:integer('expires').notNull()});
+export const sessions=sqliteTable('grouptripper_sessions',{token:text('token').primaryKey(),member:text('member').notNull(),expires:integer('expires').notNull(),trip:text('trip')});
 export const limits=sqliteTable('grouptripper_limits',{key:text('key').primaryKey(),count:integer('count').notNull(),expires:integer('expires').notNull()});
+export const spaces=sqliteTable('grouptripper_spaces',{id:text('id').primaryKey(),code:text('code').notNull().unique(),created:integer('created').notNull()});
+export const memberships=sqliteTable('grouptripper_memberships',{member:text('member').notNull(),trip:text('trip').notNull(),role:text('role').notNull()},t=>[primaryKey({columns:[t.member,t.trip]})]);
+export const shirtJobs=sqliteTable('shirt_jobs',{id:text('id').primaryKey(),trip_id:text('trip_id').notNull(),member_id:text('member_id').notNull(),author:text('author').notNull(),input:text('input').notNull(),status:text('status').notNull(),lease:text('lease'),lease_until:integer('lease_until'),error:text('error'),created_at:integer('created_at').notNull(),updated_at:integer('updated_at').notNull(),deleted_at:integer('deleted_at')},t=>[index('shirt_member_date').on(t.member_id,t.created_at),index('shirt_date').on(t.created_at),index('shirt_trip').on(t.trip_id)]);
+export const shirtWorker=sqliteTable('shirt_worker',{id:text('id').primaryKey(),state:text('state').notNull(),updated_at:integer('updated_at').notNull()});

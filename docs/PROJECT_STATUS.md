@@ -1,4 +1,13 @@
-# Project status
+# Current status — November 7, 2026
+
+- Existing public GroupTripper demo upgraded to hosted mode: independent shared trips, account-based trip organizers, invite codes, configurable choices, and switching between up to five trips per account. Maximum 50 guests per trip. No source-trip records or private assets copied.
+- Added private per-trip Shirt Studio galleries, editable prompts and lettering, refresh, adult concealment, cancellation and hiding. Server-enforced caps: 2/account and 10/deployment per rolling 24 hours, 1 pending/account. Canceled/hidden/failed jobs still count. Caps are atomic and apply across trips.
+- Schema migration 0001 adds memberships, trip spaces, session trip selection, shirt jobs/worker heartbeat. Existing migrations are unchanged. R2 BUCKET stores previews. Legacy demo/live modes remain available.
+- The owner explicitly approved a separate Windows on-demand task, Mac coordinator and fresh queue-only credentials for the demo. Private installation/configuration stays outside Git. The existing golf-trip Site/database/configuration remains separate.
+- Verified 14 existing unit/distribution tests, TypeScript, production build, disposable loopback API checks for tenant isolation and concurrent quotas, and desktop/mobile browser behavior. Runtime generation verification is recorded in the release follow-up below.
+
+## First release (historical)
+
 
 GroupTripper is an independent public project, not a branch or history copy of the private golf trip.
 

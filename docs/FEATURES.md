@@ -1,6 +1,6 @@
 # Features and boundaries
 
-GroupTripper generalizes the planning flow of a private group trip without distributing its guests, private history, deployment credentials, pictures, destination portraits, or local AI machinery.
+GroupTripper generalizes the planning flow of a private group trip without distributing its guests, private history, deployment credentials, pictures, destination portraits, or private renderer credentials and runtime configuration.
 
 ## Included
 
@@ -15,14 +15,14 @@ GroupTripper generalizes the planning flow of a private group trip without distr
 
 ## Deliberate limits
 
-- One trip per deployment, up to 50 guests. This is not a multi-tenant hosting service. Each organizer owns their own Site/database.
+- Shared hosted mode supports separate groups, up to 50 guests per trip and five trips per account. The trip creator is its organizer. Membership checks gate every shared read/write, including shirt assets. Legacy live mode remains one trip per deployment.
 - Up to 12 date choices and 12 destination choices; 500 expenses, 300 plans and 300 messages per trip. These are bounded small-group tools.
 - USD and equal splits only. No currency conversion, payment collection, payment requests sent automatically, or recording completed repayments. Don't enter a reimbursement as a new expense: that double-counts costs.
 - Refresh the shared trip to see other users' changes. Conflicting writes are rejected rather than overwriting newer data. Save drafts before leaving the page.
-- Date choices and destination rankings use configurable lists; no live travel search, flight availability, bookings, weather lookup, automatic destination scoring, crime rankings, maps or AI shirt generation. These source-trip-specific integrations are not distributed as working features in this independent version.
+- Date choices and destination rankings use configurable lists; no live travel search, flight availability, bookings, weather lookup, automatic destination scoring, crime rankings, maps or maps. Shirt Studio is included with a separately paired renderer; it is not an online image-generation service bundled with every copied deployment.
 - No email/SMS notifications, guest contact collection, file uploads or automated password recovery. Organizers should maintain appropriate backups through their hosting provider and agree on guest-account support before inviting a group.
-- Guest responses, names, plans and expenses are visible to signed-in trip members. Do not use it for sensitive financial records; record shared trip costs only. The public demo never writes shared accounts or records.
-- The organizer display name in intake is a label. It grants no access. Live organizer authorization comes only from the configured, verified ChatGPT identity.
+- Guest responses, names, plans and expenses are visible to signed-in trip members. Do not use it for sensitive financial records; record shared trip costs only. The hosted demo saves real test accounts and trip records in its own database. Browser-only demo mode remains separate and local.
+- The organizer display name in intake is a label. It grants no access. Legacy live organizer authorization comes only from the configured, verified ChatGPT identity. In hosted mode, the account that creates a trip receives that trip’s organizer membership; editing the display label cannot grant that role.
 
 ## Demo behavior
 
@@ -31,3 +31,9 @@ Demo state is stored under `grouptripper-demo-v1` in localStorage. Each browser 
 ## Donations
 
 Suggested contribution: $20, optional. Venmo: https://venmo.com/u/Mark-Greenwood-14. PayPal and Apple Cash have no configured destination; they remain explicitly unlinked until the project owner supplies public details. Donation links open the provider; the app does not process payments or receive payment credentials. Replicas may update the donation section in `app/grouptripper.tsx`.
+
+## Shirt Studio
+
+Each trip has a private gallery of generated artwork and shirt mockups. The server allows 2 submissions per account / rolling 24 hours across all trips, 10 submissions total / rolling 24 hours across the deployment, and 1 pending design per account. New accounts cannot bypass the deployment-wide cap. Separate accounts cannot be reliably identified as the same human; the global cap is the backstop. Canceling, hiding and failed generation do not refund quota. Refresh updates designs and allowances without losing the draft.
+
+Adult designs are flagged by their submitter and concealed until explicitly revealed. This is not automatic content classification. Generation uses an owner-operated worker and may wait while the renderer is unavailable. Images are preview assets, not guaranteed print-ready files. The worker credential only accesses its queue and leased uploads; the coordinator credential only accesses queue counts and worker health. It cannot access trip records.

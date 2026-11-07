@@ -9,11 +9,15 @@
 
 Plan a family reunion, friends getaway, outdoor adventure, retreat, city break or any other group trip. Organizers configure dates, destinations, activities, budget bands, room choices and optional planning tabs through an intake form. Guests RSVP, vote, rank destinations, coordinate travel/meals/groceries/itinerary, chat and split expenses.
 
-## Try the demo
+## Try the shared demo
 
-The default mode is a fictional example with six sample guests. Choose **Guest tour**, enter a made-up nickname, and participate as a new guest. Your changes stay in your browser. Other visitors get their own copy; reset whenever you like. No private source-trip data, personal pictures, passwords, phone numbers or emails are included.
+Open the [demo site](https://grouptripper.mrgreenw.chatgpt.site/), choose **Create your trip**, and make an account. Customize your dates, places, and planning tools, then use **Copy invite** to send friends the site and your trip code. They choose **Join a trip** and create their own accounts. No ChatGPT account or separate hosting setup is needed.
 
-Choose **Make it yours** to fill the organizer intake, apply it to a fresh browser-only example, and download settings. The **Get the template** page walks through copying and hosting your own trip.
+Each trip's records and Shirt Studio gallery are restricted to its members. The trip creator is its organizer. Accounts can join up to five trips; each trip supports up to 50 guests. **My trips** switches between groups. This shared demo uses durable hosted storage, so changes follow you across devices.
+
+**Shirt Studio limits:** two submissions per account across all trips in a rolling 24 hours, ten across the entire demo in a rolling 24 hours, and one queued/rendering design per account. Canceled, hidden and failed designs still count. The interface shows remaining allowances, and atomic server checks prevent simultaneous submissions from exceeding them. Designs wait while the renderer is offline.
+
+The original fictional browser-only tour is still available to self-hosted copies using `GROUPTRIPPER_MODE=demo`; it never creates shared records. `live` remains the legacy single-trip mode. The shared demo uses the new `hosted` mode. See [setup](docs/SETUP.md) and [Shirt Studio](docs/SHIRT_STUDIO.md).
 
 ## Quick local start
 
@@ -37,7 +41,7 @@ node --test tests/*.test.ts
 npm run build
 ```
 
-See SETUP.md for disposable shared-mode API checks. Browser demo and shared mode use the same validated trip operations. Live records use D1, revision checks, guest credentials and secure sessions. The supported hosted organizer login uses the Sites ChatGPT identity integration. This is not a multi-tenant service: each real trip needs its own deployment.
+See SETUP.md for disposable shared-mode API checks. Browser demo and shared mode use the same validated trip operations. Live records use D1, revision checks, guest credentials and secure sessions. The supported hosted organizer login uses the Sites ChatGPT identity integration. Hosted mode isolates groups through membership-checked sessions and trip-scoped database operations. Self-hosting is optional.
 
 ## Layout
 
@@ -53,7 +57,7 @@ See SETUP.md for disposable shared-mode API checks. Browser demo and shared mode
 | `examples/grouptripper-config.json` | Non-secret example intake settings |
 | `scripts/new-trip.mjs` | Detach a new copy from the example's hosting identity |
 
-No email/SMS, bookings, automated password recovery, payment processing, currency conversion or AI shirt generation is included. See FEATURES.md before running a real trip. The first release passed automated checks; visual browser QA was unavailable in the development session.
+No email/SMS, bookings, automated password recovery, payment processing or currency conversion is included. Shirt Studio requires an independently paired render worker; the public example has its own pairing. See FEATURES.md before running a real trip. The shared-demo update passed unit tests, TypeScript, local isolation/quota API checks and desktop/mobile browser checks.
 
 ## Optional thank-you
 
