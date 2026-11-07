@@ -15,6 +15,13 @@
       "when": 1794078366144,
       "tag": "0001_glamorous_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794080654694,
+      "tag": "0002_previous_venus",
+      "breakpoints": true
     }
   ]
 }

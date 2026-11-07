@@ -1,10 +1,12 @@
 'use client';
 import {useEffect,useState} from 'react';
+import Controls from './demo-controls';
+import type {DemoControls,DemoUsage} from '../lib/demo-controls';
 import {results,type Board} from '../lib/trip';
 import './owner.css';
 type Trip={id:string;name:string;organizer:string;created:number;guests:number;in:number;submitted:number;expected:number;designs:number};
 type Job={id:string;author:string;status:string;error:string|null;createdAt:number;removed:boolean;nsfw:boolean;hidden:boolean;input:{idea:string;headline:string}|null;assets:{artwork:string;shirt:string}|null};
-type Data={counts:{trips:number;accounts:number;designsToday:number;pending:number};trips:Trip[];page:number;detail:{id:string;board:Board;jobs:Job[]}|null;worker:{id:string;state:string;online:boolean}[];privateTripAdminUrl:string|null};
+type Data={controls:DemoControls;usage:DemoUsage;counts:{trips:number;accounts:number;designsToday:number;pending:number};trips:Trip[];page:number;detail:{id:string;board:Board;jobs:Job[]}|null;worker:{id:string;state:string;online:boolean}[];privateTripAdminUrl:string|null};
 export default function OwnerDashboard({signInUrl,signOutUrl}:{signInUrl:string;signOutUrl:string}){
  const [data,setData]=useState<Data|null>(null),[page,setPage]=useState(0),[trip,setTrip]=useState(''),[adult,setAdult]=useState(false),[refresh,setRefresh]=useState(0),[busy,setBusy]=useState(true),[error,setError]=useState(''),[access,setAccess]=useState(0);
  useEffect(()=>{const abort=new AbortController();setBusy(true);setError('');
@@ -19,6 +21,7 @@ export default function OwnerDashboard({signInUrl,signOutUrl}:{signInUrl:string;
  <div className="owner-toolbar"><p>Demo records only · Each group stays separate</p><button disabled={busy} onClick={()=>setRefresh(n=>n+1)}>{busy?'Refreshing…':'↻ Refresh'}</button></div>{error&&<div className="error" role="alert">{error}</div>}
  <div className="owner-stats"><div className="card"><strong>{data.counts.trips}</strong><span>demo trips</span></div><div className="card"><strong>{data.counts.accounts}</strong><span>registered accounts</span></div><div className="card"><strong>{data.counts.designsToday} / 10</strong><span>designs · rolling 24 hours</span></div><div className="card"><strong>{data.counts.pending}</strong><span>designs waiting / rendering</span></div></div>
  <p className="muted">Demo renderer: {worker?.online?worker.state:'offline'} · 2 designs per account / 24 hours · 1 pending per account</p>
+ <Controls key={data.controls.revision} initial={data.controls} usage={data.usage} onSaved={()=>setRefresh(n=>n+1)}/>
  <section className="card"><div className="section-heading"><h2>All demo trips</h2><span className="muted">Page {page+1}</span></div>{!data.trips.length?<p>{page?'No trips on this page.':'No demo trips yet. New trips will appear here.'}</p>:<div className="owner-trip-grid">{data.trips.map(t=><button className={trip===t.id?'owner-trip selected':'owner-trip'} key={t.id} aria-pressed={trip===t.id} onClick={()=>{setAdult(false);setTrip(t.id);}}><strong>{t.name}</strong><span>Organizer: {t.organizer}</span><span>{t.guests} guests · {t.in} In · {t.submitted}/{t.expected} responses</span><span>{t.designs} shirt designs</span><b>{trip===t.id?'Viewing this trip':'Review trip →'}</b></button>)}</div>}<div className="actions"><button disabled={busy||page===0} onClick={()=>setPage(p=>p-1)}>Previous</button><button disabled={busy||(page+1)*25>=data.counts.trips} onClick={()=>setPage(p=>p+1)}>Next</button></div></section>
  {trip&&!detail&&busy&&<p role="status">Loading trip…</p>}{detail&&b&&r&&<section className="owner-detail" aria-label="Selected demo trip"><div className="section-heading"><div><span className="eyebrow">DEMO TRIP · OWNER REVIEW</span><h2>{b.config.name}</h2><p>{b.config.kind} · Organizer: {b.config.organizer}</p></div><button onClick={()=>{setTrip('');setAdult(false);}}>Close trip</button></div>
  <section className="card"><h3>People & responses</h3><div className="owner-table"><table><thead><tr><th>Guest</th><th>RSVP</th><th>Preferences</th><th>Budget / room</th></tr></thead><tbody>{b.guests.map(g=><tr key={g.id}><th>{g.name}</th><td>{g.rsvp==='pending'?'Not answered':g.rsvp==='in'?'In':'Out'}</td><td>{g.submitted?'Saved':'Waiting'}</td><td>{g.budget||'Not selected'}<br/><small>{g.room}</small></td></tr>)}</tbody></table></div></section>

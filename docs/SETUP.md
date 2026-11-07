@@ -102,10 +102,18 @@ Commit and push your own repository after changes. On the other computer, inspec
 
 ## Shared-demo development and renderer pairing
 
-For hosted-mode local checks, use ignored `.dev.vars` with `GROUPTRIPPER_MODE=hosted`. Apply all schema migrations in order, including `0001_glamorous_proudstar.sql`. Run `node tests/hosted-api-smoke.mjs` against disposable loopback storage with a worker hash for the test-only token specified in that script. It verifies group isolation, organizer boundaries, worker leases and concurrent quotas, and removes the records it creates. Never use its test token in production.
+For hosted-mode local checks, use ignored `.dev.vars` with `GROUPTRIPPER_MODE=hosted`. Apply all schema migrations in order, including `0001_glamorous_proudstar.sql` and `0002_previous_venus.sql`. Run `node tests/hosted-api-smoke.mjs` against disposable loopback storage with a worker hash for the test-only token specified in that script. It verifies group isolation, organizer boundaries, worker leases and concurrent quotas, and removes the records it creates. Never use its test token in production.
 
 See [SHIRT_STUDIO.md](SHIRT_STUDIO.md) for the optional worker protocol and runtime secrets. Do not copy an existing worker's secrets or source-trip data into a public template.
 
 ## Hosted demo owner dashboard
 
 Set `ORGANIZER_EMAIL` to the verified ChatGPT email of this deployment’s owner, then deploy. `/admin` provides read-only oversight of all demo groups and their shirt designs. Guest accounts and trip organizers cannot access it. Optionally set `PRIVATE_TRIP_ADMIN_URL` to an HTTPS admin link for your separate private trip. The link is returned only after owner authorization; no credentials or trip data cross sites. The public app discloses that the site owner can review shared trip content. Replicas must configure their own owner identity and storage.
+
+### Sharing controls
+
+At the top of an organizer's trip, use **Share this trip** or **Copy invite link**. **Pause invites** stops new joins. **Replace invite link** invalidates earlier codes without removing members. **Share GroupTripper** gives friends a clean link to create their own trip.
+
+The site owner's `/admin` page has a Demo capacity form with editable daily/total caps and pause switches. These controls are available only to the configured verified ChatGPT owner, not ordinary trip organizers. Defaults are 10 trips/100 accounts per rolling day, 100 trips/1,000 accounts total, and 500 shirt designs total; daily render limits remain unchanged. Pauses and limits affect new activity, not existing members' access.
+
+For local verification after applying migration 0002, run `node tests/sharing-guardrails-smoke.mjs` in addition to the hosted smoke tests. It changes and restores controls on disposable loopback storage, exercises revocation and concurrent capacity limits, and removes its fixtures. Never point tests at a deployed site.

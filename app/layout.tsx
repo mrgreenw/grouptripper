@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "GroupTripper · Good trips start together",
-  description: "A configurable group-trip planner. Try the fictional guest tour, customize your own trip, and get the free template.",
+  description: "Create your own group trip, invite friends, vote on dates and places, and try Shirt Studio.",
 icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

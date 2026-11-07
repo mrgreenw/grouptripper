@@ -1,3 +1,4 @@
+import {demoControls,demoUsage,admissionError} from './guardrails';
 import {env} from 'cloudflare:workers';
 import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {db as tripDatabase,digest as tokenHash,input as validateInput,response,error as fail} from './backend';
@@ -17,7 +18,9 @@ export async function shirtsGET(req:Request){try{
  const rows=await db.prepare('SELECT * FROM shirt_jobs WHERE trip_id=? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 80').bind(who.trip).all<Job>();
  const beat=await db.prepare("SELECT updated_at,state FROM shirt_worker WHERE id='local'").first<{updated_at:number;state:string}>();
  const counts=await db.prepare("SELECT SUM(CASE WHEN created_at>? THEN 1 ELSE 0 END) AS total,SUM(CASE WHEN member_id=? AND created_at>? THEN 1 ELSE 0 END) AS personal,SUM(CASE WHEN member_id=? AND status IN ('queued','rendering') THEN 1 ELSE 0 END) AS pending,MIN(CASE WHEN created_at>? THEN created_at END) AS oldest FROM shirt_jobs").bind(since,who.member,since,who.member,since).first<{total:number;personal:number;pending:number;oldest:number|null}>();
- return response({worker:beat&&beat.updated_at>now()-90?beat.state:'offline',enabled:!!config().SHIRT_WORKER_TOKEN_SHA256,limits:{personal:2,total:10,pending:1,personalRemaining:Math.max(0,2-(counts?.personal||0)),totalRemaining:Math.max(0,10-(counts?.total||0)),pendingNow:counts?.pending||0,windowHours:24},jobs:rows.results.map(j=>{const input=JSON.parse(j.input),hidden=input.nsfw&&!reveal;return {id:j.id,status:j.status,createdAt:j.created_at,author:j.author,mine:j.member_id===who.member,nsfw:input.nsfw,hidden,input:hidden?null:input,error:j.error,assets:j.status==='completed'&&!hidden?Object.fromEntries(assetKinds.map(k=>[k,`/api/shirts/${j.id}/${k}${input.nsfw?'?adult=1':''}`])):null};})});
+ const controls=await demoControls(),usage=await demoUsage();
+ const unavailable=controls.shirtsPaused?'New shirt designs are paused by the site owner.':usage.designs>=controls.designsTotal?'The demo design storage limit has been reached.':null;
+ return response({unavailable,worker:beat&&beat.updated_at>now()-90?beat.state:'offline',enabled:!!config().SHIRT_WORKER_TOKEN_SHA256&&!unavailable,limits:{personal:2,total:10,pending:1,personalRemaining:Math.max(0,2-(counts?.personal||0)),totalRemaining:Math.max(0,10-(counts?.total||0)),pendingNow:counts?.pending||0,windowHours:24},jobs:rows.results.map(j=>{const input=JSON.parse(j.input),hidden=input.nsfw&&!reveal;return {id:j.id,status:j.status,createdAt:j.created_at,author:j.author,mine:j.member_id===who.member,nsfw:input.nsfw,hidden,input:hidden?null:input,error:j.error,assets:j.status==='completed'&&!hidden?Object.fromEntries(assetKinds.map(k=>[k,`/api/shirts/${j.id}/${k}${input.nsfw?'?adult=1':''}`])):null};})});
  }catch(e){return fail(e);}}
 export async function shirtsPOST(req:Request){try{
  const a=await validateInput(req),who=await tripSession(req),db=tripDatabase(),time=now();
@@ -37,7 +40,7 @@ export async function shirtsPOST(req:Request){try{
  const result=await db.prepare("INSERT INTO shirt_jobs (id,trip_id,member_id,author,input,status,created_at,updated_at) SELECT ?,?,?,?,?,'queued',?,? WHERE (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND status IN ('queued','rendering'))<1 AND (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND created_at>?)<2 AND (SELECT COUNT(*) FROM shirt_jobs WHERE created_at>?)<10").bind(id,who.trip,who.member,author,JSON.stringify(design),time,time,who.member,who.member,time-86400,time-86400).run();
  if(!result.meta.changes)throw failure('Demo limit reached: 1 pending design per person, 2 per person in 24 hours, and 10 total across all trips in 24 hours. Canceling or deleting does not restore a daily allowance.',429);
  return response({id},201);
- }catch(e){return fail(e);}}
+ }catch(e){return fail(admissionError(e));}}
 export async function assetGET(req:Request,id:string,kind:string){try{
  const who=await tripSession(req),db=tripDatabase();if(!validJobId(id)||!assetKinds.includes(kind as 'shirt'))throw failure('Image not found.',404);
  const job=await db.prepare("SELECT * FROM shirt_jobs WHERE id=? AND trip_id=? AND status='completed' AND deleted_at IS NULL").bind(id,who.trip).first<Job>();if(!job)throw failure('Image not found.',404);

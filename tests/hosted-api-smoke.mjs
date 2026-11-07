@@ -22,7 +22,7 @@ try{
  }
  const overview=await req('/api/admin',ownerCookie);assert.equal(overview.status,200,JSON.stringify(overview.data));assert.ok(overview.data.trips.some(t=>t.id===a.tripId));assert.ok(overview.data.trips.some(t=>t.id===b.tripId));
  const ownerA=await req('/api/admin?trip='+a.tripId,ownerCookie);assert.equal(ownerA.status,200);assert.equal(ownerA.data.detail.board.config.name,a.board.config.name);assert.ok(!JSON.stringify(ownerA.data).includes('password'));assert.ok(!JSON.stringify(ownerA.data).includes(a.inviteCode));
- assert.equal((await req('/api/admin?trip='+crypto.randomUUID(),ownerCookie)).status,404);assert.equal((await req('/api/trip',ownerCookie)).data.signedIn,false);assert.equal((await req('/api/admin',ownerCookie,{type:'config'})).status,405);
+ assert.equal((await req('/api/admin?trip='+crypto.randomUUID(),ownerCookie)).status,404);assert.equal((await req('/api/trip',ownerCookie)).data.signedIn,false);assert.equal((await req('/api/admin',ownerCookie,{type:'config'})).status,400);
 
  assert.equal((await req('/api/auth',b.cookie,{type:'switch',tripId:a.tripId})).status,403);
  assert.equal((await req('/api/trip',c.cookie,{type:'config',revision:c.board.revision,config:c.board.config})).status,403);
@@ -63,7 +63,7 @@ try{
  assert.equal((await req('/api/auth',a.cookie,{type:'switch',tripId:a.tripId})).status,200);assert.equal((await req('/api/trip',a.cookie)).data.board.config.kind,'Golf trip');
  const joined=await req('/api/auth',a.cookie,{type:'add-group',groupAction:'join',name:'A in another group',code:b.inviteCode});assert.equal(joined.status,200);assert.equal((await req('/api/trip',a.cookie)).data.organizer,false);assert.equal((await submit(a)).status,429);
  await req('/api/auth',a.cookie,{type:'logout'});assert.equal((await req('/api/shirts',a.cookie)).status,401);
- console.log('PASS: themed and custom trip creation, saved templates across sessions, unknown-template rejection, join cannot change template; verified owner-only demo overview/details/assets, no guest/worker/spoofed-header escalation, read-only owner access, adult concealment, private hidden assets; trip creation/join/login/switch, organizer boundaries, private groups and galleries, CSRF, stale writes, NSFW hiding, idempotency, worker leases, 1 pending/account, 2 daily/account across trips, concurrent global 10/day cap, hidden/canceled jobs retain quota.');
+ console.log('PASS: themed and custom trip creation, saved templates across sessions, unknown-template rejection, join cannot change template; verified owner-only demo overview/details/assets, no guest/worker/spoofed-header escalation, owner access boundaries, adult concealment, private hidden assets; trip creation/join/login/switch, organizer boundaries, private groups and galleries, CSRF, stale writes, NSFW hiding, idempotency, worker leases, 1 pending/account, 2 daily/account across trips, concurrent global 10/day cap, hidden/canceled jobs retain quota.');
 }finally{
  const ids=accounts.map(x=>`'${x}'`).join(','),groups=trips.map(x=>`'${x}'`).join(',');if(ids)for(const statement of [`DELETE FROM shirt_jobs WHERE member_id IN (${ids})`,`DELETE FROM grouptripper_sessions WHERE member IN (${ids})`,`DELETE FROM grouptripper_memberships WHERE member IN (${ids})`,`DELETE FROM grouptripper_accounts WHERE id IN (${ids})`])sql(statement);if(groups)for(const statement of [`DELETE FROM grouptripper_spaces WHERE id IN (${groups})`,`DELETE FROM grouptripper_trip WHERE id IN (${groups})`])sql(statement);
 }
