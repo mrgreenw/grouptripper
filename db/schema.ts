@@ -12,3 +12,5 @@ export const shirtJobs=sqliteTable('shirt_jobs',{id:text('id').primaryKey(),trip
 export const shirtWorker=sqliteTable('shirt_worker',{id:text('id').primaryKey(),state:text('state').notNull(),updated_at:integer('updated_at').notNull()});
 
 export const controls=sqliteTable('grouptripper_controls',{id:text('id').primaryKey(),revision:integer('revision').notNull().default(0),tripsPaused:integer('tripsPaused').notNull().default(0),accountsPaused:integer('accountsPaused').notNull().default(0),shirtsPaused:integer('shirtsPaused').notNull().default(0),tripsDaily:integer('tripsDaily').notNull().default(10),accountsDaily:integer('accountsDaily').notNull().default(100),tripsTotal:integer('tripsTotal').notNull().default(100),accountsTotal:integer('accountsTotal').notNull().default(1000),designsTotal:integer('designsTotal').notNull().default(500)});
+
+export const passwordResets=sqliteTable('grouptripper_password_resets',{accountId:text('account_id').primaryKey().references(()=>accounts.id,{onDelete:'cascade'}),tokenHash:text('token_hash').notNull().unique(),expires:integer('expires').notNull(),created:integer('created').notNull()});

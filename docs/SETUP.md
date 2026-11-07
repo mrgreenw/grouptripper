@@ -4,7 +4,7 @@
 
 Visit https://grouptripper.mrgreenw.chatgpt.site/ and choose a trip theme or Build a custom trip. Themed starters include editable example weekends and destination ideas; custom trips ask for your own first date range and destination. Enter your trip name, display name, username and an 8-character-or-longer password. No special characters or ChatGPT account required. Configure the date and destination choices, then Copy invite. Friends choose Join a trip and enter that code. My trips lets an existing account create or join another group. Trip settings are editable only by that trip's creator.
 
-The shared demo includes Shirt Studio with 2/account/day, 10/deployment/day, and 1 pending/account. Daily means a rolling 24 hours. Rendering is provided by the demo owner's separately paired worker. There is no password recovery flow; keep your sign-in details.
+The shared demo includes Shirt Studio with 2/account/day, 10/deployment/day, and 1 pending/account. Daily means a rolling 24 hours. Rendering is provided by the demo owner's separately paired worker. If you lose access, ask the site owner for a reset link. The owner opens `/admin`, selects your trip, confirms your identity and username under **Sign-in help**, and chooses **Create reset link**. Share it privately or use **Open reset page** for your own account. It expires after 30 minutes and works once; saving a new password signs out old sessions without deleting trips. No reset email or SMS is sent.
 
 ## Host your own copy (optional)
 
@@ -102,13 +102,13 @@ Commit and push your own repository after changes. On the other computer, inspec
 
 ## Shared-demo development and renderer pairing
 
-For hosted-mode local checks, use ignored `.dev.vars` with `GROUPTRIPPER_MODE=hosted`. Apply all schema migrations in order, including `0001_glamorous_proudstar.sql` and `0002_previous_venus.sql`. Run `node tests/hosted-api-smoke.mjs` against disposable loopback storage with a worker hash for the test-only token specified in that script. It verifies group isolation, organizer boundaries, worker leases and concurrent quotas, and removes the records it creates. Never use its test token in production.
+For hosted-mode local checks, use ignored `.dev.vars` with `GROUPTRIPPER_MODE=hosted`. Apply all schema migrations in order, including `0001_glamorous_proudstar.sql`, `0002_previous_venus.sql`, and `0003_absent_gladiator.sql`. Run `node tests/hosted-api-smoke.mjs` against disposable loopback storage with a worker hash for the test-only token specified in that script. It verifies group isolation, organizer boundaries, worker leases and concurrent quotas, and removes the records it creates. Never use its test token in production.
 
 See [SHIRT_STUDIO.md](SHIRT_STUDIO.md) for the optional worker protocol and runtime secrets. Do not copy an existing worker's secrets or source-trip data into a public template.
 
 ## Hosted demo owner dashboard
 
-Set `ORGANIZER_EMAIL` to the verified ChatGPT email of this deployment’s owner, then deploy. `/admin` provides read-only oversight of all demo groups and their shirt designs. Guest accounts and trip organizers cannot access it. Optionally set `PRIVATE_TRIP_ADMIN_URL` to an HTTPS admin link for your separate private trip. The link is returned only after owner authorization; no credentials or trip data cross sites. The public app discloses that the site owner can review shared trip content. Replicas must configure their own owner identity and storage.
+Set `ORGANIZER_EMAIL` to the verified ChatGPT email of this deployment’s owner, then deploy. `/admin` provides oversight of all demo groups and their shirt designs, capacity controls, and owner-only account recovery. Guest accounts and trip organizers cannot access it. Optionally set `PRIVATE_TRIP_ADMIN_URL` to an HTTPS admin link for your separate private trip. The link is returned only after owner authorization; no credentials or trip data cross sites. The public app discloses that the site owner can review shared trip content. Replicas must configure their own owner identity and storage.
 
 ### Sharing controls
 
@@ -117,3 +117,5 @@ At the top of an organizer's trip, use **Share this trip** or **Copy invite link
 The site owner's `/admin` page has a Demo capacity form with editable daily/total caps and pause switches. These controls are available only to the configured verified ChatGPT owner, not ordinary trip organizers. Defaults are 10 trips/100 accounts per rolling day, 100 trips/1,000 accounts total, and 500 shirt designs total; daily render limits remain unchanged. Pauses and limits affect new activity, not existing members' access.
 
 For local verification after applying migration 0002, run `node tests/sharing-guardrails-smoke.mjs` in addition to the hosted smoke tests. It changes and restores controls on disposable loopback storage, exercises revocation and concurrent capacity limits, and removes its fixtures. Never point tests at a deployed site.
+
+For account recovery regression checks, run `node tests/password-recovery-smoke.mjs` against disposable loopback storage after migration 0003. It checks owner authorization, CSRF, hashed tokens, expiry, replacement, concurrent single use, session revocation, and trip preservation, then removes its fixtures.

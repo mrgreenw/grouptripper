@@ -1,5 +1,7 @@
 # Current status — November 7, 2026
 
+- Added hosted-demo account recovery: owner-only username lookup and 30-minute, single-use reset links; password visibility controls and direct `/#signin` entry. Migration 0003 adds only a reset-token table. Reset tokens are hashed and atomically consumed with password replacement and session revocation; trips and designs are retained. Verified registration/sign-out/sign-in and dedicated local recovery regression tests, including owner authorization, CSRF, expiry, replacement, races, and isolation.
+
 - Shirt Studio theme starters: eight realistic AI-generated shirt concept mockups with optimized WebP assets and recorded generation prompts, two editable prompts per theme, matching default draft, alternate theme selection, blank idea, and protection before replacing edited drafts. Public `/shirt-examples` lets visitors browse/copy ideas without registration or rendering. No API/schema/renderer changes. Verified 25 unit tests, TypeScript, all theme selectors, desktop/mobile previews, and local draft loading without shirt submissions.
 
 - Added direct trip invitations and a separate start-your-own-trip share link. Mobile native share and clipboard fallback, preserved invitations through sign-in, organizer pause/resume/replace controls, and 96-bit codes for new invitations.

@@ -59,7 +59,7 @@ See SETUP.md for disposable shared-mode API checks. Browser demo and shared mode
 | `examples/grouptripper-config.json` | Non-secret example intake settings |
 | `scripts/new-trip.mjs` | Detach a new copy from the example's hosting identity |
 
-No email/SMS, bookings, automated password recovery, payment processing or currency conversion is included. Shirt Studio requires an independently paired render worker; the public example has its own pairing. See FEATURES.md before running a real trip. The shared-demo update passed unit tests, TypeScript, local isolation/quota API checks and desktop/mobile browser checks.
+Password help is available through the site owner: an expiring, single-use reset link preserves saved trips. No email/SMS delivery, automated identity verification, bookings, payment processing or currency conversion is included. Shirt Studio requires an independently paired render worker; the public example has its own pairing. See FEATURES.md before running a real trip. The shared-demo update passed unit tests, TypeScript, local isolation/quota API checks and desktop/mobile browser checks.
 
 ## Optional thank-you
 

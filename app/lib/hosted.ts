@@ -1,4 +1,5 @@
 import {randomBytes} from 'node:crypto';
+import {resetPassword} from './password-recovery';
 import {db,digest,sessionKey,cookie,input,response,error,passwordHash,check,throttle} from './backend';
 import {changeBoard,emptyBoard,emptyGuest,fail,type Board,type Action} from './trip';
 import {checkAdmission,admissionError} from './guardrails';
@@ -54,6 +55,7 @@ async function startSession(r:Request,id:string,trip:string){await db().prepare(
 export async function hostedAuth(r:Request){try{
  const a=await input(r);if(a.type==='logout'){await db().prepare('DELETE FROM grouptripper_sessions WHERE token=?').bind(digest(sessionKey(r))).run();const res=response({saved:true});res.headers.set('Set-Cookie',cookie(r,'',0));return res;}
  await throttle(r);
+ if(a.type==='reset-password')return await resetPassword(a);
  if(a.type==='switch'||a.type==='add-group'){
   const s=await tripSession(r);let trip:string;
   if(a.type==='switch'){const m=await db().prepare('SELECT trip FROM grouptripper_memberships WHERE member=? AND trip=?').bind(s.member,typeof a.tripId==='string'?a.tripId:'').first<{trip:string}>();if(!m)throw fail('You are not a member of that trip.',403);trip=m.trip;}else trip=await addGroup(r,a,s.member);
