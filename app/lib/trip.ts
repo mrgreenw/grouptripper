@@ -3,6 +3,9 @@ import {parseExpenseAmount,summarizeExpenses,type ExpenseData} from './expenses.
 export const modules=['travel','meals','groceries','agenda','messages','expenses'] as const;
 export type Module=typeof modules[number];
 export type Config={name:string;kind:string;welcome:string;organizer:string;dates:{id:string;end:string;label:string}[];destinations:Destination[];activities:string[];budgets:string[];rooms:string[];modules:Module[]};
+export function renumberDateOptions(dates:Config['dates']):Config['dates']{
+ return dates.map((d,i)=>/^Weekend option \d+$/.test(d.label)?{...d,label:`Weekend option ${i+1}`}:d);
+}
 export type Guest={id:string;name:string;rsvp:'in'|'out'|'pending';available:string[];ranked:string[];budget:string;room:string;interests:string[];submitted:boolean;dateRanked?:string[];priorities?:Record<string,number>;spending?:number;comfort?:number;datesSubmitted?:boolean;placesSubmitted?:boolean;preferencesSaved?:boolean;ballotMode?:'auto'|'manual'};
 export type Cost=ExpenseData&{id:string;createdBy:string;removed:boolean};
 export type Plan={id:string;kind:Module;title:string;details:string;owner:string;done:boolean};
@@ -19,7 +22,7 @@ function profileFields(d:Destination,activities:string[]){return {...(d.ratings!
 export function validateConfig(value:unknown):Config{
  if(!value||typeof value!=='object')throw fail('Choose a valid trip configuration.');const c=value as Config;
  if(!Array.isArray(c.dates)||c.dates.length<1||c.dates.length>12)throw fail('Add 1–12 date options.');
- const dates=c.dates.map(d=>{const id=date(d.id),end=date(d.end);if(end<id)throw fail('A date option must end on or after it starts.');return {id,end,label:text(d.label,'Date label',60)};});if(new Set(dates.map(d=>d.id)).size!==dates.length)throw fail('Date options need unique starting dates.');
+ const dates=renumberDateOptions(c.dates.map(d=>{const id=date(d.id),end=date(d.end);if(end<id)throw fail('A date option must end on or after it starts.');return {id,end,label:text(d.label,'Date label',60)};}));if(new Set(dates.map(d=>d.id)).size!==dates.length)throw fail('Date options need unique starting dates.');
  if(!Array.isArray(c.destinations)||c.destinations.length<1||c.destinations.length>12)throw fail('Add 1–12 destinations.');const destinations=c.destinations.map(d=>{const id=text(d.id,'Destination ID',50);if(!/^[a-z0-9-]+$/.test(id))throw fail('Destination IDs use lowercase letters, numbers and hyphens.');return {id,name:text(d.name,'Destination name',80),description:text(d.description,'Destination description',300,0),...profileFields(d,strings(c.activities,'Activities'))};});if(new Set(destinations.map(d=>d.id)).size!==destinations.length)throw fail('Destination IDs must be unique.');
  if(!Array.isArray(c.modules)||c.modules.some(m=>!modules.includes(m))||new Set(c.modules).size!==c.modules.length)throw fail('Choose supported planning tabs.');
  return {name:text(c.name,'Trip name',80),kind:text(c.kind,'Trip type',60),organizer:text(c.organizer,'Organizer display name',60),welcome:text(c.welcome,'Welcome',600),dates,destinations,activities:strings(c.activities,'Activities'),budgets:strings(c.budgets,'Budget bands',8),rooms:strings(c.rooms,'Room preferences',8),modules:c.modules};

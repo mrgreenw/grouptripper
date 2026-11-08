@@ -1,4 +1,9 @@
-# Current status — November 7, 2026
+# Current status — November 8, 2026
+
+## Weekend option numbering — November 8, 2026
+
+- Removing a date option immediately renumbers the remaining default “Weekend option N” labels. Existing gaps are corrected when opening the organizer intake and on settings validation/save/import/export. Custom labels, date IDs, and saved votes are preserved; dates used by guests remain protected from removal.
+- Verified 37 unit tests and TypeScript. Browser QA on a disposable local hosted trip confirmed deleting the middle option leaves options 1 and 2 with the original first/third dates, and that the correction persists after saving and reloading. No production records or renderer behavior changed.
 
 ## Full planning experience — November 7, 2026
 
