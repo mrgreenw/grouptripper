@@ -1,3 +1,4 @@
+import {guestBoard} from './planning';
 import {randomBytes} from 'node:crypto';
 import {resetPassword} from './password-recovery';
 import {db,digest,sessionKey,cookie,input,response,error,passwordHash,check,throttle} from './backend';
@@ -14,7 +15,7 @@ export async function scopedBoard(trip:string):Promise<Board>{const row=await db
 async function sessionPayload(s:TripSession){
  const board=await scopedBoard(s.trip),rows=await db().prepare('SELECT m.trip,t.data FROM grouptripper_memberships m JOIN grouptripper_trip t ON t.id=m.trip WHERE m.member=?').bind(s.member).all<{trip:string;data:string}>();
  const space=s.role==='organizer'?await db().prepare('SELECT code,invites_paused,invite_revision FROM grouptripper_spaces WHERE id=?').bind(s.trip).first<{code:string;invites_paused:number;invite_revision:number}>():null;
- return {mode:'hosted',board,me:s.member,organizer:s.role==='organizer',tripId:s.trip,inviteCode:space?.code,invitesPaused:!!space?.invites_paused,inviteRevision:space?.invite_revision,groups:rows.results.map(x=>({id:x.trip,name:(JSON.parse(x.data) as Board).config.name}))};
+ return {mode:'hosted',board:guestBoard(board,s.member),me:s.member,organizer:s.role==='organizer',tripId:s.trip,inviteCode:space?.code,invitesPaused:!!space?.invites_paused,inviteRevision:space?.invite_revision,groups:rows.results.map(x=>({id:x.trip,name:(JSON.parse(x.data) as Board).config.name}))};
 }
 export async function hostedTrip(r:Request){try{
  let s:TripSession;try{s=await tripSession(r);}catch(e){if(r.method==='GET'&&(e as {status:number}).status===401)return response({mode:'hosted',signedIn:false});throw e;}

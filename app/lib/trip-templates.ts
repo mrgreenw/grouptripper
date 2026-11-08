@@ -13,6 +13,17 @@ export const tripTemplates:TripTemplate[]=[
  {id:'birthday-weekend',label:'Birthday weekend',name:'The Birthday Getaway',description:'Make a milestone—or any birthday—an excuse to get away together.',welcome:'A birthday is a good reason to get everyone together. Let’s find a weekend, choose a place, and plan a celebration with our favorite people.',activities:['Celebration dinner','Food & drink','Live entertainment','Outdoor adventure','Group activities','Relaxation'],rooms,budgets,destinations:[place('city-birthday','City weekend','A special dinner and plenty to explore.'),place('shared-house','House getaway','A shared home for meals, games, and celebrating together.'),place('resort-birthday','Resort escape','A comfortable stay with activities close by.')],nights:2},
  {id:'custom',label:'Build a custom trip',name:'',description:'Your occasion, your dates, your places. Start with your own idea.',welcome:'Let’s plan a trip together. Share your availability, favorite places, and priorities so we can create a plan that works for our group.',activities:['Food & drink','Outdoors','Relaxation'],rooms:['Private room','Shared room','Flexible'],budgets,destinations:[],nights:2}
 ];
+// Five editable ideas let new themed trips use a complete top-five ballot.
+const extraIdeas:Record<string,Config['destinations']>={
+ 'family-reunion':[place('city-reunion','City reunion','A central gathering place with museums and shared meals.'),place('resort-reunion','Resort reunion','On-site activities and space for different generations.')],
+ 'golf-trip':[place('mountain-golf','Mountain golf retreat','Scenic courses and a quieter home base.'),place('lakeside-golf','Lakeside golf getaway','Course time, lake time, and evenings together.')],
+ 'girls-weekend':[place('resort-weekend','Resort retreat','Comfort, activities, and time to recharge.'),place('lake-house','Lakeside house','A shared house for meals and slow mornings.')],
+ 'boys-weekend':[place('coastal-getaway','Coastal escape','Beach time, outdoor activities, and dinner together.'),place('golf-resort','Golf resort','Courses and a convenient group home base.')],
+ 'bachelor-party':[place('lake-house','Lakeside house','Group games and a celebratory meal together.'),place('mountain-retreat','Mountain retreat','Outdoor days and a shared celebration.')],
+ 'bachelorette-party':[place('country-retreat','Countryside retreat','Scenic surroundings and a shared celebration.'),place('lake-house','Lakeside house','A private home base for the whole group.')],
+ 'birthday-weekend':[place('beach-weekend','Beach weekend','Days by the water and a birthday dinner.'),place('mountain-retreat','Mountain retreat','An outdoor adventure to mark the occasion.')]
+};
+for(const template of tripTemplates)if(extraIdeas[template.id])template.destinations.push(...extraIdeas[template.id]);
 export function getTripTemplate(id:unknown){const template=tripTemplates.find(t=>t.id===id);if(!template)throw fail('Choose a trip template or Build a custom trip.');return template;}
 function weekendOptions(nights:number,now:Date){
  const first=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+28));

@@ -1,3 +1,4 @@
+import {guestBoard} from './planning';
 import {env} from 'cloudflare:workers';
 import {createHash,randomBytes,scryptSync,timingSafeEqual} from 'node:crypto';
 import {getChatGPTUser} from '../chatgpt-auth';
@@ -24,7 +25,7 @@ export async function input(r:Request){if(r.headers.get('Origin')!==new URL(r.ur
 export async function tripRequest(r:Request){if(settings().GROUPTRIPPER_MODE==='hosted')return (await import('./hosted')).hostedTrip(r);try{
  if(!isLive()){if(r.method!=='GET')throw fail('The public tour does not accept shared writes.',403);return response({mode:'demo'});}
  const admin=await owner(),me=await member(r);if(!admin&&!me){if(r.method!=='GET')throw fail('Sign in first.',401);return response({mode:'live',signedIn:false,name:'GroupTripper'});}
- const b=await readBoard();if(r.method!=='GET'){const a=await input(r);if(a.revision!==b.revision)throw fail('The trip changed. Refresh before saving; your draft is kept.',409);const next=changeBoard(b,a,me||'organizer',admin);await writeBoard(b,next);return response({mode:'live',board:next,me,organizer:admin});}return response({mode:'live',board:b,me,organizer:admin});
+ const b=await readBoard();if(r.method!=='GET'){const a=await input(r);if(a.revision!==b.revision)throw fail('The trip changed. Refresh before saving; your draft is kept.',409);const next=changeBoard(b,a,me||'organizer',admin);await writeBoard(b,next);return response({mode:'live',board:admin&&!me?next:guestBoard(next,me),me,organizer:admin});}return response({mode:'live',board:admin&&!me?b:guestBoard(b,me),me,organizer:admin});
  }catch(e){return error(e);}}
 const params={N:32768,r:8,p:3,maxmem:48*1024*1024};
 export function passwordHash(password:string){const salt=randomBytes(16).toString('hex');return salt+':'+scryptSync(password,salt,32,params).toString('hex');}

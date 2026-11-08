@@ -1,5 +1,15 @@
 # Current status — November 7, 2026
 
+## Full planning experience — November 7, 2026
+
+- Replaced the simplified guest form with RSVP, calendar dates and date rankings, preference sliders, live destination scoring, accommodations, explicit top-five ballot submission, visual group results and a guest voting checklist. Existing records remain compatible through optional JSON fields; no schema or account reset.
+- Calendar options support arbitrary configured date ranges, including overlapping ranges and cross-month trips. Date and location rankings support dragging/touch handles, arrows, numeric rank/apply, and resets. Both budgets and rooms are visible together with fit colors and mismatch warnings. Saving accommodations advances to My ballot.
+- Every nominated place remains visible regardless of fit. New themed trips have five generic, editable ideas; existing shortlists stay unchanged. Guest nominations live within Places. Organizer-editable profiles and clearly labeled illustrative starter profiles power fit scoring; unknown places are unscored and still eligible for voting.
+- Separate date/place submission states preserve submitted votes when sliders change. Both submitted ballots unlock results; RSVP/status remains visible, and other ballots/preferences are redacted server-side until the viewer has voted. Group results include availability/preference shading, leading date/destination, and bar charts.
+- No original-trip records, photographs, private images, or private Git history were imported. Shirt Studio, its gallery and quotas remain intact; rendering was not changed. The original golf deployment is untouched.
+- Verified 36 unit tests, TypeScript, local API regression, and browser checks. Regression coverage for migration compatibility, scoring/sorting, partial and final saves, edits after submission, validation, redaction, trip isolation and stale updates. Browser QA covered the guest flow, manual date ranks, drag order, low-budget suite warning, all-place override, and mobile width (390px) with no horizontal overflow.
+
+
 - Added a private, account-ID-based Shirt Studio testing pool with 20 designs/account and 20 shared per rolling 24 hours, independent of the normal 2/account and 10 shared guest allowance. Both pools retain one pending design and global pause/storage controls. The gallery and owner dashboard display live caps and separate usage. No owner privileges or cross-trip access are granted. Account assignments remain private deployment settings.
 
 - Added hosted-demo account recovery: owner-only username lookup and 30-minute, single-use reset links; password visibility controls and direct `/#signin` entry. Migration 0003 adds only a reset-token table. Reset tokens are hashed and atomically consumed with password replacement and session revocation; trips and designs are retained. Verified registration/sign-out/sign-in and dedicated local recovery regression tests, including owner authorization, CSRF, expiry, replacement, races, and isolation.
