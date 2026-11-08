@@ -1,5 +1,10 @@
 # Current status — November 8, 2026
 
+## Trip navigation on phones — November 8, 2026
+
+- Trip section buttons wrap into rows instead of requiring a sideways swipe. Phones use two columns with at least 44px tap targets; larger screens wrap as needed. Active-section and unsaved-draft behavior are unchanged.
+- Browser checks confirmed all 14 section buttons fit horizontally, Dates and Shirt Studio open at narrow phone widths, and Places opens with wrapped desktop navigation. No page/nav horizontal overflow in those checks. TypeScript passed. The separate personal golf planner already wraps its trip navigation, so no matching code change was needed there.
+
 ## Weekend option numbering — November 8, 2026
 
 - Removing a date option immediately renumbers the remaining default “Weekend option N” labels. Existing gaps are corrected when opening the organizer intake and on settings validation/save/import/export. Custom labels, date IDs, and saved votes are preserved; dates used by guests remain protected from removal.
