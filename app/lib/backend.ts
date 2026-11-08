@@ -3,7 +3,7 @@ import {createHash,randomBytes,scryptSync,timingSafeEqual} from 'node:crypto';
 import {getChatGPTUser} from '../chatgpt-auth';
 import {isSiteOwner} from './owner-auth';
 import {changeBoard,emptyBoard,emptyGuest,fail,type Board,type Action} from './trip';
-type Settings={DB:D1Database;GROUPTRIPPER_MODE?:string;ORGANIZER_EMAIL?:string;TRIP_CODE_SHA256?:string;PRIVATE_TRIP_ADMIN_URL?:string};
+type Settings={DB:D1Database;GROUPTRIPPER_MODE?:string;ORGANIZER_EMAIL?:string;TRIP_CODE_SHA256?:string;PRIVATE_TRIP_ADMIN_URL?:string;SHIRT_TEST_ACCOUNT_IDS?:string;SHIRT_TEST_DAILY_LIMIT?:string};
 export const settings=()=>env as unknown as Settings;
 export const isLive=()=>['live','hosted'].includes(settings().GROUPTRIPPER_MODE||'');
 export const response=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});

@@ -15,7 +15,7 @@ try{
  for(const cookie of ['',a.cookie,b.cookie])assert.equal((await req('/api/admin',cookie,action)).status,401);
  assert.equal((await req('/api/admin',ownerCookie,action,{Origin:'https://bad.example'})).status,403);
  assert.equal((await req('/api/admin',ownerCookie,{...action,accountId:crypto.randomUUID()})).status,404);
- const detail=await req('/api/admin?trip='+a.tripId,ownerCookie);assert.equal(detail.status,200);assert.deepEqual(detail.data.detail.accounts,[{id:a.me,username:a.username}]);assert.ok(!JSON.stringify(detail.data).includes('password'));
+ const detail=await req('/api/admin?trip='+a.tripId,ownerCookie);assert.equal(detail.status,200);assert.deepEqual(detail.data.detail.accounts.map(({id,username})=>({id,username})),[{id:a.me,username:a.username}]);assert.ok(!JSON.stringify(detail.data).includes('password'));
  const extraSession=await req('/api/auth','',{type:'login',username:a.username.toUpperCase(),password});assert.equal(extraSession.status,200);
  async function issue(){const r=await req('/api/admin',ownerCookie,action);assert.equal(r.status,200,JSON.stringify(r.data));const url=new URL(r.data.path,base);assert.equal(url.pathname,'/reset-password');assert.equal(url.search,'');const token=new URLSearchParams(url.hash.slice(1)).get('token');assert.match(token,/^[a-f0-9]{64}$/);return token;}
  const reset=(token,newPassword=password)=>req('/api/auth','',{type:'reset-password',token,password:newPassword});

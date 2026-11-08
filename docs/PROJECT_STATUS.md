@@ -1,5 +1,7 @@
 # Current status — November 7, 2026
 
+- Added a private, account-ID-based Shirt Studio testing pool with 20 designs/account and 20 shared per rolling 24 hours, independent of the normal 2/account and 10 shared guest allowance. Both pools retain one pending design and global pause/storage controls. The gallery and owner dashboard display live caps and separate usage. No owner privileges or cross-trip access are granted. Account assignments remain private deployment settings.
+
 - Added hosted-demo account recovery: owner-only username lookup and 30-minute, single-use reset links; password visibility controls and direct `/#signin` entry. Migration 0003 adds only a reset-token table. Reset tokens are hashed and atomically consumed with password replacement and session revocation; trips and designs are retained. Verified registration/sign-out/sign-in and dedicated local recovery regression tests, including owner authorization, CSRF, expiry, replacement, races, and isolation.
 
 - Shirt Studio theme starters: eight realistic AI-generated shirt concept mockups with optimized WebP assets and recorded generation prompts, two editable prompts per theme, matching default draft, alternate theme selection, blank idea, and protection before replacing edited drafts. Public `/shirt-examples` lets visitors browse/copy ideas without registration or rendering. No API/schema/renderer changes. Verified 25 unit tests, TypeScript, all theme selectors, desktop/mobile previews, and local draft loading without shirt submissions.

@@ -1,4 +1,5 @@
 import {demoControls,demoUsage,admissionError} from './guardrails';
+import {shirtQuotaSettings,shirtLimitsFor,type ShirtQuotaEnvironment} from './shirt-quotas';
 import {env} from 'cloudflare:workers';
 import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {db as tripDatabase,digest as tokenHash,input as validateInput,response,error as fail} from './backend';
@@ -6,7 +7,7 @@ import {tripSession} from './hosted';
 import {fail as failure} from './trip';
 import {shirtInput,validJobId,assetKinds} from './shirts';
 import {requireSiteOwner} from './owner-server';
-type Bindings={BUCKET:R2Bucket;SHIRT_WORKER_TOKEN_SHA256?:string;SHIRT_COORDINATOR_TOKEN_SHA256?:string};
+type Bindings=ShirtQuotaEnvironment&{BUCKET:R2Bucket;SHIRT_WORKER_TOKEN_SHA256?:string;SHIRT_COORDINATOR_TOKEN_SHA256?:string};
 const config=()=>env as unknown as Bindings;
 const now=()=>Math.floor(Date.now()/1000),token=()=>randomBytes(32).toString('hex');
 const clean=(v:unknown,label:string,max:number,min=1)=>{if(typeof v!=='string'||v.length<min||v.length>max)throw failure(`Check ${label}.`);return v;};
@@ -14,16 +15,16 @@ type Job={id:string;trip_id:string;member_id:string;author:string;input:string;s
 async function body(r:Request){const raw=await r.text();if(raw.length>10000)throw failure('Request too large.',413);try{return JSON.parse(raw) as Record<string,unknown>;}catch{throw failure('Invalid JSON.');}}
 async function workerAuth(req:Request){const expected=config().SHIRT_WORKER_TOKEN_SHA256,raw=req.headers.get('Authorization')?.replace(/^Bearer /,'')||'';if(!expected||!/^[a-f0-9]{64}$/.test(expected)||!/^[a-f0-9]{64}$/.test(raw)||!timingSafeEqual(Buffer.from(tokenHash(raw)),Buffer.from(expected)))throw failure('Worker authorization failed.',401);return tripDatabase();}
 export async function shirtsGET(req:Request){try{
- const who=await tripSession(req),db=tripDatabase(),reveal=new URL(req.url).searchParams.get('adult')==='1',since=now()-86400;
+ const who=await tripSession(req),db=tripDatabase(),reveal=new URL(req.url).searchParams.get('adult')==='1',since=now()-86400,quotas=shirtQuotaSettings(config()),limits=shirtLimitsFor(who.member,quotas);
  const rows=await db.prepare('SELECT * FROM shirt_jobs WHERE trip_id=? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 80').bind(who.trip).all<Job>();
  const beat=await db.prepare("SELECT updated_at,state FROM shirt_worker WHERE id='local'").first<{updated_at:number;state:string}>();
- const counts=await db.prepare("SELECT SUM(CASE WHEN created_at>? THEN 1 ELSE 0 END) AS total,SUM(CASE WHEN member_id=? AND created_at>? THEN 1 ELSE 0 END) AS personal,SUM(CASE WHEN member_id=? AND status IN ('queued','rendering') THEN 1 ELSE 0 END) AS pending,MIN(CASE WHEN created_at>? THEN created_at END) AS oldest FROM shirt_jobs").bind(since,who.member,since,who.member,since).first<{total:number;personal:number;pending:number;oldest:number|null}>();
+ const counts=await db.prepare("SELECT SUM(CASE WHEN created_at>? AND (member_id IN (SELECT value FROM json_each(?)))=? THEN 1 ELSE 0 END) AS total,SUM(CASE WHEN member_id=? AND created_at>? THEN 1 ELSE 0 END) AS personal,SUM(CASE WHEN member_id=? AND status IN ('queued','rendering') THEN 1 ELSE 0 END) AS pending,MIN(CASE WHEN created_at>? THEN created_at END) AS oldest FROM shirt_jobs").bind(since,JSON.stringify(quotas.testAccountIds),limits.pool==='testing'?1:0,who.member,since,who.member,since).first<{total:number;personal:number;pending:number;oldest:number|null}>();
  const controls=await demoControls(),usage=await demoUsage();
  const unavailable=controls.shirtsPaused?'New shirt designs are paused by the site owner.':usage.designs>=controls.designsTotal?'The demo design storage limit has been reached.':null;
- return response({unavailable,worker:beat&&beat.updated_at>now()-90?beat.state:'offline',enabled:!!config().SHIRT_WORKER_TOKEN_SHA256&&!unavailable,limits:{personal:2,total:10,pending:1,personalRemaining:Math.max(0,2-(counts?.personal||0)),totalRemaining:Math.max(0,10-(counts?.total||0)),pendingNow:counts?.pending||0,windowHours:24},jobs:rows.results.map(j=>{const input=JSON.parse(j.input),hidden=input.nsfw&&!reveal;return {id:j.id,status:j.status,createdAt:j.created_at,author:j.author,mine:j.member_id===who.member,nsfw:input.nsfw,hidden,input:hidden?null:input,error:j.error,assets:j.status==='completed'&&!hidden?Object.fromEntries(assetKinds.map(k=>[k,`/api/shirts/${j.id}/${k}${input.nsfw?'?adult=1':''}`])):null};})});
+ return response({unavailable,worker:beat&&beat.updated_at>now()-90?beat.state:'offline',enabled:!!config().SHIRT_WORKER_TOKEN_SHA256&&!unavailable,limits:{...limits,personalRemaining:Math.max(0,limits.personal-(counts?.personal||0)),totalRemaining:Math.max(0,limits.total-(counts?.total||0)),pendingNow:counts?.pending||0},jobs:rows.results.map(j=>{const input=JSON.parse(j.input),hidden=input.nsfw&&!reveal;return {id:j.id,status:j.status,createdAt:j.created_at,author:j.author,mine:j.member_id===who.member,nsfw:input.nsfw,hidden,input:hidden?null:input,error:j.error,assets:j.status==='completed'&&!hidden?Object.fromEntries(assetKinds.map(k=>[k,`/api/shirts/${j.id}/${k}${input.nsfw?'?adult=1':''}`])):null};})});
  }catch(e){return fail(e);}}
 export async function shirtsPOST(req:Request){try{
- const a=await validateInput(req),who=await tripSession(req),db=tripDatabase(),time=now();
+ const a=await validateInput(req),who=await tripSession(req),db=tripDatabase(),time=now(),quotas=shirtQuotaSettings(config()),limits=shirtLimitsFor(who.member,quotas);
  if(a.action==='cancel'||a.action==='delete'){
   const id=clean(a.id,'Design',36,36);if(!validJobId(id))throw failure('Choose a valid design.');
   const j=await db.prepare('SELECT id FROM shirt_jobs WHERE id=? AND trip_id=? AND member_id=?').bind(id,who.trip,who.member).first();if(!j)throw failure('Design not found.',404);
@@ -37,8 +38,8 @@ export async function shirtsPOST(req:Request){try{
  const existing=await db.prepare('SELECT id FROM shirt_jobs WHERE id=? AND member_id=? AND trip_id=?').bind(id,who.member,who.trip).first();if(existing)return response(existing);
  const board=await db.prepare('SELECT data FROM grouptripper_trip WHERE id=?').bind(who.trip).first<{data:string}>(),author=JSON.parse(board!.data).guests.find((g:{id:string})=>g.id===who.member)?.name||'Guest';
  // One INSERT statement makes both daily caps and the pending limit atomic, even across trips.
- const result=await db.prepare("INSERT INTO shirt_jobs (id,trip_id,member_id,author,input,status,created_at,updated_at) SELECT ?,?,?,?,?,'queued',?,? WHERE (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND status IN ('queued','rendering'))<1 AND (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND created_at>?)<2 AND (SELECT COUNT(*) FROM shirt_jobs WHERE created_at>?)<10").bind(id,who.trip,who.member,author,JSON.stringify(design),time,time,who.member,who.member,time-86400,time-86400).run();
- if(!result.meta.changes)throw failure('Demo limit reached: 1 pending design per person, 2 per person in 24 hours, and 10 total across all trips in 24 hours. Canceling or deleting does not restore a daily allowance.',429);
+ const result=await db.prepare("INSERT INTO shirt_jobs (id,trip_id,member_id,author,input,status,created_at,updated_at) SELECT ?,?,?,?,?,'queued',?,? WHERE (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND status IN ('queued','rendering'))<? AND (SELECT COUNT(*) FROM shirt_jobs WHERE member_id=? AND created_at>?)<? AND (SELECT COUNT(*) FROM shirt_jobs WHERE created_at>? AND (member_id IN (SELECT value FROM json_each(?)))=?)<?").bind(id,who.trip,who.member,author,JSON.stringify(design),time,time,who.member,limits.pending,who.member,time-86400,limits.personal,time-86400,JSON.stringify(quotas.testAccountIds),limits.pool==='testing'?1:0,limits.total).run();
+ if(!result.meta.changes)throw failure(`Limit reached: ${limits.pending} pending design per person, ${limits.personal} per person in 24 hours, and ${limits.total} across the ${limits.pool==='testing'?'admin testing':'guest demo'} pool in 24 hours. Canceling or deleting does not restore a daily allowance.`,429);
  return response({id},201);
  }catch(e){return fail(admissionError(e));}}
 export async function assetGET(req:Request,id:string,kind:string){try{
